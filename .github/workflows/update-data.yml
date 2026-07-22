@@ -33,7 +33,7 @@ jobs:
         run: |
           git config user.name "lottery-data-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/*.json
+          git add -A data
           if git diff --cached --quiet; then
             echo "数据没有变化，跳过提交"
           else
