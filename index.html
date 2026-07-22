@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>福纸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --kraft:#C7A876;
+    --kraft-light:#E4CFA0;
+    --kraft-panel:#EDDBAF;
+    --ink:#2B2118;
+    --ink-soft:#6B5A44;
+    --seal:#9C2B22;
+    --jade:#3F6659;
+    --rule: rgba(43,33,24,0.22);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.06), transparent 40%),
+      #7C5E3B;
+    font-family:'Noto Serif SC', serif;
+    color:var(--ink);
+    padding:30px 14px 70px;
+    display:flex;
+    justify-content:center;
+  }
+  .ledger{
+    width:100%;
+    max-width:880px;
+    position:relative;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 37px, var(--rule) 37px 38px),
+      radial-gradient(circle at 15% 20%, rgba(255,255,255,0.10), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(0,0,0,0.06), transparent 50%),
+      var(--kraft-light);
+    box-shadow:0 40px 70px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(0,0,0,0.08);
+    padding:6px 6px 24px 44px;
+    clip-path: polygon(0% 1%, 2% 0%, 98% 0.5%, 100% 1.5%, 99.5% 99%, 97% 100%, 3% 99.3%, 0.5% 98%);
+  }
+  /* 左侧红线装订边 */
+  .ledger::before{
+    content:"";
+    position:absolute;
+    left:30px; top:0; bottom:0;
+    width:2px;
+    background:var(--seal);
+    opacity:.65;
+  }
+  .ledger::after{
+    content:"";
+    position:absolute;
+    left:0; top:0; bottom:0; width:30px;
+    background:
+      repeating-linear-gradient(180deg, rgba(0,0,0,0.12) 0 3px, transparent 3px 26px);
+  }
+  /* 牛皮纸纤维颗粒纹理 —— SVG 分形噪声叠一层，做出纸张做旧质感 */
+  .ledger .grain{
+    position:absolute; inset:0;
+    pointer-events:none;
+    opacity:.45;
+    mix-blend-mode:multiply;
+    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 0.17  0 0 0 0 0.13  0 0 0 0 0.09  0 0 0 0.45 0"/></filter><rect width="100%25" height="100%25" filter="url(%23n)"/></svg>');
+    background-size:220px 220px;
+  }
+
+  .seal-badge{
+    position:absolute;
+    top:22px; right:26px;
+    width:64px; height:64px;
+    border:3px solid var(--seal);
+    color:var(--seal);
+    border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Noto Serif SC', serif;
+    font-weight:900;
+    font-size:13px;
+    line-height:1.2;
+    text-align:center;
+    transform:rotate(-6deg);
+    opacity:.85;
+    letter-spacing:.1em;
+  }
+
+  header.title{
+    padding:34px 40px 10px;
+  }
+  header.title .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.3em;
+    color:var(--ink-soft);
+  }
+  header.title h1{
+    font-family:'Ma Shan Zheng', cursive;
+    font-size:46px;
+    margin:2px 0 6px;
+    color:var(--ink);
+  }
+  header.title p{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin:0;
+    line-height:1.8;
+  }
+
+  .section{ padding:20px 40px; }
+  .section h2{
+    font-family:'Noto Serif SC', serif;
+    font-weight:700;
+    font-size:14.5px;
+    margin:0 0 14px;
+    padding-left:10px;
+    border-left:3px solid var(--seal);
+    color:var(--ink);
+    letter-spacing:.02em;
+  }
+
+  .tabs{ display:flex; gap:0; }
+  .tab{
+    font-family:'Noto Serif SC', serif;
+    font-weight:700;
+    font-size:14px;
+    padding:9px 22px;
+    border:1px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    cursor:pointer;
+    position:relative;
+    margin-right:-1px;
+  }
+  .tab.active{ background:var(--ink); color:var(--kraft-panel); }
+
+  .range-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .range-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    padding:6px 13px;
+    border:1px solid var(--ink-soft);
+    background:var(--kraft-panel);
+    color:var(--ink);
+    cursor:pointer;
+    border-radius:2px;
+  }
+  .range-btn.active{ background:var(--jade); border-color:var(--jade); color:#F2ECD9; }
+  .range-custom{ display:flex; align-items:center; gap:6px; font-family:'IBM Plex Mono', monospace; font-size:12.5px; }
+  .range-custom input{
+    width:60px; font-family:'IBM Plex Mono', monospace;
+    padding:5px 7px; border:1px solid var(--ink-soft); background:var(--kraft-panel);
+  }
+  .meta-line{
+    margin-top:12px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+  }
+
+  .entry-row{
+    display:flex; flex-wrap:wrap; align-items:center; gap:12px;
+    padding:12px 14px;
+    background:var(--kraft-panel);
+    border:1px solid var(--rule);
+  }
+  .entry-row .issue{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px; color:var(--ink-soft);
+    width:100%;
+  }
+  .bead{
+    width:32px;height:32px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:13px;
+    color:#fff; flex-shrink:0;
+  }
+  .bead.red{ background:var(--seal); }
+  .bead.jade{ background:var(--jade); }
+  .bead-sm{ width:23px; height:23px; font-size:10.5px; }
+
+  table.draws{
+    width:100%; border-collapse:collapse;
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+  }
+  table.draws th{
+    text-align:left; font-weight:600; padding:6px 6px;
+    border-bottom:1px solid var(--ink); color:var(--ink-soft);
+  }
+  table.draws td{ padding:7px 6px; border-bottom:1px dotted var(--rule); }
+  table.draws tr:nth-child(even) td{ background:rgba(63,102,89,0.06); }
+  .balls-inline{ display:flex; gap:5px; flex-wrap:wrap; }
+  .scroll-list{ max-height:270px; overflow-y:auto; }
+
+  /* 命中率排行 */
+  .hitrate-row{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .hitrate-rank{
+    width:16px; font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft); flex-shrink:0;
+  }
+  .hitrate-num{
+    width:28px;height:28px;border-radius:50%;
+    font-family:'IBM Plex Mono', monospace; font-size:11.5px; font-weight:600;
+    color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .hitrate-track{
+    flex:1; height:10px; background:rgba(43,33,24,0.10); position:relative;
+  }
+  .hitrate-fill{ height:100%; }
+  .hitrate-fill.red{ background:var(--seal); }
+  .hitrate-fill.jade{ background:var(--jade); }
+  .hitrate-pct{
+    width:56px; text-align:right;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600; color:var(--ink);
+  }
+
+  .cols2{ display:grid; grid-template-columns:1fr 1fr; gap:26px; }
+  @media (max-width:640px){ .cols2{ grid-template-columns:1fr; } }
+
+  .label{
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--ink-soft);
+    text-transform:uppercase; letter-spacing:.14em; margin-bottom:6px; display:block;
+  }
+  .chip-row{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+
+  .disclaimer{
+    margin:4px 40px 10px;
+    padding:16px 18px;
+    font-size:11.5px; line-height:1.85; color:var(--ink-soft);
+    font-family:'IBM Plex Mono', monospace;
+    background:rgba(255,255,255,0.18);
+    border-left:3px solid var(--ink-soft);
+  }
+  .disclaimer b{ color:var(--ink); }
+
+  .colophon{
+    text-align:center; font-family:'Ma Shan Zheng', cursive;
+    font-size:14px; color:var(--ink-soft); padding:10px 0 4px;
+    opacity:.7;
+  }
+</style>
+</head>
+<body>
+<div class="ledger">
+  <div class="grain"></div>
+  <div class="seal-badge">号数<br>统计</div>
+
+  <header class="title">
+    <h1>福纸</h1>
+    <p>选彩种、翻区间，逐期记录，按号计数，看哪个号在这段区间里最常报到。</p>
+  </header>
+
+  <div class="section">
+    <h2>彩种</h2>
+    <div class="tabs">
+      <button class="tab active" data-game="ssq">双色球</button>
+      <button class="tab" data-game="dlt">大乐透</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>参考期数</h2>
+    <div class="range-row">
+      <button class="range-btn" data-n="30">近30期</button>
+      <button class="range-btn active" data-n="50">近50期</button>
+      <button class="range-btn" data-n="100">近100期</button>
+      <button class="range-btn" data-n="200">近200期</button>
+      <div class="range-custom">
+        自定
+        <input type="number" id="customN" min="10" max="260" placeholder="80">
+        <button class="range-btn" id="applyCustom">记</button>
+      </div>
+    </div>
+    <div class="meta-line" id="metaLine"></div>
+  </div>
+
+  <div class="section">
+    <h2>本期入账</h2>
+    <div class="entry-row" id="latestTicket"></div>
+  </div>
+
+  <div class="section">
+    <h2>区间流水（<span id="rangeLabel"></span>）</h2>
+    <div class="scroll-list">
+      <table class="draws">
+        <thead><tr><th>期号</th><th>日期</th><th>号码</th></tr></thead>
+        <tbody id="drawsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>中标率最高号码（本区间）</h2>
+    <div class="cols2">
+      <div>
+        <span class="label" id="zoneLabelA">红球 / 前区</span>
+        <div id="hitrateA"></div>
+      </div>
+      <div>
+        <span class="label" id="zoneLabelB">蓝球 / 后区</span>
+        <div id="hitrateB"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <b>账本小记：</b> 双色球、大乐透每期开奖均为独立随机事件，历史出现频率（中标率）与下一期开出的号码之间
+    没有统计学上的因果关系或预测力——某个号码在过去区间内出现得多，并不代表它下一期"更容易"或"更不容易"出现。
+    本账本所记之中标率排行，仅供了解某一区间的历史分布，不构成任何"必中"依据，请理性购彩、量力而行。
+  </div>
+  <div class="colophon">· 记于案头，供闲览 ·</div>
+</div>
+
+<script>
+function seededRandom(seed){
+  let s = seed;
+  return function(){ s = (s * 9301 + 49297) % 233280; return s / 233280; };
+}
+function pickUnique(rand, count, min, max){
+  const set = new Set();
+  while(set.size < count) set.add(min + Math.floor(rand() * (max - min + 1)));
+  return Array.from(set).sort((a,b)=>a-b);
+}
+function genDraws(game, total){
+  const rand = seededRandom(game === 'ssq' ? 20260001 : 20261001);
+  const draws = [];
+  const baseDate = new Date('2026-07-20');
+  for(let i=0;i<total;i++){
+    const d = new Date(baseDate);
+    d.setDate(d.getDate() - i * (game==='ssq'?2:3));
+    const issue = 2026000 + (total - i);
+    let front, back;
+    if(game === 'ssq'){ front = pickUnique(rand, 6, 1, 33); back = pickUnique(rand, 1, 1, 16); }
+    else { front = pickUnique(rand, 5, 1, 35); back = pickUnique(rand, 2, 1, 12); }
+    draws.push({ issue:String(issue), date:d.toISOString().slice(0,10), front, back });
+  }
+  return draws;
+}
+const CONFIG = {
+  ssq:{ frontMax:33, frontPick:6, backMax:16, backPick:1, zoneA:'红球', zoneB:'蓝球', name:'双色球' },
+  dlt:{ frontMax:35, frontPick:5, backMax:12, backPick:2, zoneA:'前区', zoneB:'后区', name:'大乐透' }
+};
+let state = { game:'ssq', n:50 };
+let DATA = { ssq: [], dlt: [] };
+let DATA_SOURCE = { ssq:'示例数据', dlt:'示例数据' };
+
+// 优先尝试加载真实抓取到的数据(data/ssq.json / data/dlt.json)；
+// 若文件不存在、抓取脚本还没跑过、或者本地用 file:// 直接打开(无法fetch相对路径)，
+// 则自动降级为示例数据，保证页面始终能正常展示和交互。
+async function loadRealData(game){
+  try{
+    const res = await fetch(`data/${game}.json`, { cache: 'no-store' });
+    if(!res.ok) throw new Error('no file');
+    const payload = await res.json();
+    if(!payload.draws || payload.draws.length < 5) throw new Error('empty');
+    DATA_SOURCE[game] = `真实数据 · 更新于 ${payload.updatedAt ? payload.updatedAt.slice(0,16).replace('T',' ') : '未知时间'}`;
+    return payload.draws;
+  } catch(e){
+    DATA_SOURCE[game] = '示例数据（尚未接入真实抓取数据，或本地直接打开文件无法读取data/目录）';
+    return genDraws(game, 260);
+  }
+}
+
+async function initData(){
+  DATA.ssq = await loadRealData('ssq');
+  DATA.dlt = await loadRealData('dlt');
+  render();
+}
+
+// 中标率 = 该号码在区间内出现的期数 / 区间总期数。
+// 展示数量按该彩种实际每期开出的号码个数来定（双色球6红+1蓝，大乐透5前区+2后区），
+// 只列出区间内中标率最高的对应个数的号码。
+function renderHitRate(elId, freq, maxNum, pickCount, totalDraws, colorClass){
+  const el = document.getElementById(elId);
+  const list = [];
+  for(let n=1;n<=maxNum;n++) list.push({ n, c: freq[n] });
+  list.sort((a,b) => b.c - a.c || a.n - b.n);
+  const top = list.slice(0, pickCount);
+  const maxPct = totalDraws ? (top[0].c / totalDraws * 100) : 0;
+  el.innerHTML = top.map((x, i) => {
+    const pct = totalDraws ? (x.c / totalDraws * 100) : 0;
+    const barPct = maxPct ? (pct / maxPct * 100) : 0;
+    return `<div class="hitrate-row">
+      <div class="hitrate-rank">${i+1}</div>
+      <div class="hitrate-num ${colorClass}">${String(x.n).padStart(2,'0')}</div>
+      <div class="hitrate-track"><div class="hitrate-fill ${colorClass}" style="width:${barPct}%"></div></div>
+      <div class="hitrate-pct">${pct.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+}
+
+function render(){
+  const cfg = CONFIG[state.game];
+  const draws = DATA[state.game].slice(0, state.n);
+
+  document.getElementById('metaLine').textContent =
+    `当前彩种：${cfg.name} ｜ 参考区间：最近 ${state.n} 期（第 ${draws[draws.length-1].issue} 期 ~ 第 ${draws[0].issue} 期）｜ 数据来源：${DATA_SOURCE[state.game]}`;
+  document.getElementById('rangeLabel').textContent = `最近 ${state.n} 期`;
+  document.getElementById('zoneLabelA').textContent = `${cfg.zoneA}（1-${cfg.frontMax}）`;
+  document.getElementById('zoneLabelB').textContent = `${cfg.zoneB}（1-${cfg.backMax}）`;
+
+  const latest = draws[0];
+  document.getElementById('latestTicket').innerHTML =
+    `<div class="issue">第 ${latest.issue} 期 · ${latest.date}</div>` +
+    latest.front.map(n=>`<span class="bead red">${String(n).padStart(2,'0')}</span>`).join('') +
+    latest.back.map(n=>`<span class="bead jade">${String(n).padStart(2,'0')}</span>`).join('');
+
+  document.getElementById('drawsBody').innerHTML = draws.map(d => `
+    <tr>
+      <td>${d.issue}</td>
+      <td>${d.date}</td>
+      <td><div class="balls-inline">
+        ${d.front.map(n=>`<span class="bead bead-sm red">${String(n).padStart(2,'0')}</span>`).join('')}
+        ${d.back.map(n=>`<span class="bead bead-sm jade">${String(n).padStart(2,'0')}</span>`).join('')}
+      </div></td>
+    </tr>`).join('');
+
+  const freqFront = new Array(cfg.frontMax+1).fill(0);
+  const freqBack = new Array(cfg.backMax+1).fill(0);
+  draws.forEach(d => {
+    d.front.forEach(n => freqFront[n]++);
+    d.back.forEach(n => freqBack[n]++);
+  });
+  renderHitRate('hitrateA', freqFront, cfg.frontMax, cfg.frontPick, draws.length, 'red');
+  renderHitRate('hitrateB', freqBack, cfg.backMax, cfg.backPick, draws.length, 'jade');
+}
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); state.game = btn.dataset.game; render();
+  });
+});
+document.querySelectorAll('.range-btn[data-n]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.range-btn[data-n]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); state.n = parseInt(btn.dataset.n,10); render();
+  });
+});
+document.getElementById('applyCustom').addEventListener('click', () => {
+  const v = parseInt(document.getElementById('customN').value,10);
+  if(v && v>=10 && v<=260){
+    document.querySelectorAll('.range-btn[data-n]').forEach(b=>b.classList.remove('active'));
+    state.n = v; render();
+  }
+});
+initData();
+</script>
+</body>
+</html>
