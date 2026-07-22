@@ -1,0 +1,42 @@
+name: 更新彩票开奖数据
+
+on:
+  schedule:
+    # UTC 15:00 = 北京时间 23:00，每天跑一次（双色球周二四日开奖，大乐透周一三六开奖，
+    # 每天固定跑一次即可覆盖所有开奖日，多跑的日子相当于原样重新确认一次数据）
+    - cron: "0 15 * * *"
+  workflow_dispatch: {}   # 允许在 GitHub 网页上手动点一下"Run workflow"立即跑一次
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取仓库代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 安装依赖
+        run: pip install requests
+
+      - name: 抓取最新开奖数据
+        run: python scripts/fetch_lottery_data.py
+        continue-on-error: true   # 抓取失败也不让整个workflow标红中断，下面还是会尝试提交已有改动
+
+      - name: 提交更新（如果数据有变化）
+        run: |
+          git config user.name "lottery-data-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/*.json
+          if git diff --cached --quiet; then
+            echo "数据没有变化，跳过提交"
+          else
+            git commit -m "chore: 更新开奖数据 $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
