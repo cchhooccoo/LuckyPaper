@@ -223,7 +223,7 @@
       <button class="pill" data-n="200">近200期</button>
       <div class="range-custom">
         <span>自定义</span>
-        <input type="number" id="customN" min="1" max="500" placeholder="80">
+        <input type="number" id="customN" min="1" max="1000" placeholder="80">
         <button id="applyCustom">查看</button>
       </div>
     </div>
@@ -377,7 +377,7 @@ document.querySelectorAll('.pill[data-n]').forEach(btn => {
 });
 document.getElementById('applyCustom').addEventListener('click', () => {
   const v = parseInt(document.getElementById('customN').value,10);
-  if(v && v>=1 && v<=500){
+  if(v && v>=1 && v<=1000){
     document.querySelectorAll('.pill[data-n]').forEach(b=>b.classList.remove('active'));
     state.n = v; render();
   }

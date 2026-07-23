@@ -27,7 +27,7 @@ import requests
 from bs4 import BeautifulSoup
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
-TARGET_COUNT = 300  # 期望保留的期数量（抓到的历史区间可能更多，最后会截取最近N期）
+TARGET_COUNT = 1000  # 期望保留的期数量（抓到的历史区间可能更多，最后会截取最近N期）
 CN_TZ = timezone(timedelta(hours=8))
 
 HEADERS = {
@@ -53,7 +53,7 @@ def _fetch_table(url):
 
 def fetch_ssq(target_count=TARGET_COUNT):
     """抓取双色球历史数据。500.com 表格列顺序：期号,红1..红6,蓝球,...(中间是奖金统计列)...,开奖日期"""
-    url = "https://datachart.500.com/ssq/history/newinc/history.php?start=18001"
+    url = "https://datachart.500.com/ssq/history/newinc/history.php?start=16001"
     rows = _fetch_table(url)
 
     draws = []
@@ -82,7 +82,7 @@ def fetch_ssq(target_count=TARGET_COUNT):
 
 def fetch_dlt(target_count=TARGET_COUNT):
     """抓取大乐透历史数据。500.com 表格列顺序：期号,前区1..5,后区1..2,...(中间是奖金统计列)...,开奖日期"""
-    url = "https://datachart.500.com/dlt/history/newinc/history.php?start=18001"
+    url = "https://datachart.500.com/dlt/history/newinc/history.php?start=16001"
     rows = _fetch_table(url)
 
     draws = []
